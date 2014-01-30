@@ -68,6 +68,12 @@ double Vec3::dot(const Vec3& v) const {
 	return v.x*x + v.y * y + v.z * z;
 }
 
+Vec3 Vec3::cross(const Vec3& v) const{
+	double xn = y*v.z - z*v.y;
+	double yn = z*v.x - x*v.z;
+	double zn = x*v.y - y*v.x;
+	return Vec3(xn, yn, zn);
+}
 Vec3& Vec3::normalize(){
 	double l2 = length2();
 	x/=l2;

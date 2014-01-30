@@ -4,9 +4,21 @@
 #include "object.h"
 using namespace std;
 
+
+// Object
+/*********************************************************************************************************************/
+
+Object::Object(Vec3 surfaceColor, double transparency, Type objectType){
+	this->surfaceColor = surfaceColor;
+	this->transparency = transparency;
+	this->objectType = objectType;
+}
+
+/*********************************************************************************************************************/
 // Sphere Object
 /*********************************************************************************************************************/
-Sphere::Sphere(Vec3 center, double radius) {
+Sphere::Sphere(Vec3 center, double radius, Vec3 surfaceColor, double transparency, Type objectType)
+	:Object(surfaceColor, transparency, objectType) {
 	this->center = center;
 	this->radius = radius;
 }
@@ -39,7 +51,8 @@ vector<Vec3> Sphere::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDi
 
 // Cylinder Object
 /*********************************************************************************************************************/
-Cylinder::Cylinder(Vec3 upVector, double radius, double height) {
+Cylinder::Cylinder(Vec3 upVector, double radius, double height, Vec3 surfaceColor, double transparency, Type objectType)
+	:Object(surfaceColor, transparency, objectType) {
 	this->upVector = upVector;
 	this->radius = radius;
 	this->height = height;
@@ -164,7 +177,8 @@ vector<Vec3> Cylinder::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &ray
 
 // Cone Object
 /*********************************************************************************************************************/
-Cone::Cone(Vec3 upVector, Vec3 inclineVector, double radius, double height) {
+Cone::Cone(Vec3 upVector, Vec3 inclineVector, double radius, double height, Vec3 surfaceColor, double transparency, Type objectType)
+	:Object(surfaceColor, transparency, objectType) {
 	this->upVector = upVector;
 	this->inclineVector = inclineVector;
 	this->radius = radius;
@@ -179,14 +193,49 @@ vector<Vec3> Cone::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDire
 
 // Triangle Object
 /*********************************************************************************************************************/
-Triangle::Triangle(Vec3 p1, Vec3 p2, Vec3 p3) {
+Triangle::Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 surfaceColor, double transparency, Type objectType)
+	:Object(surfaceColor, transparency, objectType) {
 	this->p1 = p1;
 	this->p2 = p2;
 	this->p3 = p3;
 }
 
+
+// Source : http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 vector<Vec3> Triangle::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
 	vector<Vec3> points;
-	return points;
+	Vec3 e1,e2,h,s,q;
+	double a,f,u,v,t;
+
+	e1 = p2 - p1;
+	e2 = p3 - p1;
+	h = rayDirection.cross(e2);
+	a = e1.dot(h);
+
+	if (a > -0.00001 && a < 0.00001)
+		return(points);
+
+	f = 1/a;
+	s = rayOrigin - p1;
+	u = f * (s.dot(h));
+
+	if (u < 0.0 || u > 1.0)
+		return(points);
+
+	q = s.cross(e1);
+	v = f * rayDirection.dot(q);
+
+	if (v < 0.0 || u + v > 1.0)
+		return(points);
+
+
+	t = f * e2.dot(q);
+
+	if (t > 0.00001) {
+		points.push_back(rayOrigin + (rayDirection * t));
+		return(points);
+	}
+	else
+		return (points);
 }
 /*********************************************************************************************************************/
