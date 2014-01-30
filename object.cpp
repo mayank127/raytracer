@@ -45,9 +45,120 @@ Cylinder::Cylinder(Vec3 upVector, double radius, double height) {
 	this->height = height;
 }
 
+// source : http://www.mathworks.com/matlabcentral/newsreader/view_thread/32952
 vector<Vec3> Cylinder::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
+
+	/*double a = (rayDirection.x*rayDirection.x) + (rayDirection.z * rayDirection.z);
+	double b = ((rayOrigin.x - center.x) * rayDirection.x) + ((rayOrigin.z - center.z) * rayDirection.z);
+	double c = sqr(rayOrigin.x - center.x) + sqr(rayOrigin.z - center.z) - sqr(radius);
+
+	double discriminant = b*b - a*c;
+	int hit = 0, n = 0, inside = 0;
+
+	vector<double> tHit(4,0), sHit(4,0);
+
+	if (discriminant > 0)
+		double t1, t2, disc_root;
+	    disc_root = sqrt(discriminant);
+	    if (abs(a) < 0){
+	    	t1 = ((-1 * b) - disc_root) * 1e21;
+	        t2 = ((-1 * B) + disc_root) * 1e21;
+	    }
+	    else {
+	    	t1 = ((-1 * b) - disc_root) / a;
+	        t2 = ((-1 * B) + disc_root) / a;
+	    }
+
+	    double uplim = height + center.y;
+	    double lowlim = center.y;
+	    double yHit = rayOrigin.y + (rayDirection.y * t1);
+
+	    if (t1 > 0 && yHit <= uplim && yHit>=lowlim) {
+	    	tHit[n] = t1;
+	        sHit[n] = 0;
+	        n++;
+	    }
+
+	    yHit = rayOrigin.y + (rayDirection.y * t2)
+
+	    if (t2 > 0 && yHit <= uplim && yHit>=lowlim) {
+	    	tHit[n] = t2;
+	        sHit[n] = 0;
+	        n++;
+	    }
+	}
+
+	double tb;
+	if (abs(rayDirection.y < 0) 
+		tb = 1e21;
+	else 
+		tb = (center.y - rayOrigin.y) / rayDirection.y;
+	if (tb >0 && (sqr(rayOrigin.x + (rayDirection.x * tb) - center.x) + sqr(rayOrigin.z + (rayDirection.z * tb) - center.z)) < sqr(radius)) {
+		tHit[n] = tb;
+	    sHit[n] = 1;
+	    n++;
+	}
+	    
+	double tc;
+	if (abs(rayDirection.y < 0) 
+		tc = 1e21;
+	else 
+		tc = (height + center.y - rayOrigin.y) / rayDirection.y;
+	if (tb >0 && (sqr(rayOrigin.x + (rayDirection.x * tc) - center.x) + sqr(rayOrigin.z + (rayDirection.z * tc) - center.z)) < sqr(radius)) {
+		tHit[n] = tc;
+	    sHit[n] = 2;
+	    n++;
+	}
+
+	double tnear, tfar, inside;
+	if (n==0) {
+		tnear=-1;
+		return points;
+	}
+
+	if (n==1) {
+		double inside = 1;
+	    t = (tHit.*(tHit>eps));
+	    ind = find(t==min(t));
+	    tnear = t(ind);
+	    sHit = sHit(ind);
+	    hit = 1;
+	}
+	    
+	else {
+		if (tHit[0] > tHit[1]) {
+			tnear = tHit[1];
+	        tfar = tHit[0];
+	        double t = sHit[0];
+	        sHit[0] = sHit[1];
+	        sHit[2] = t;
+		}
+	    else {
+	    	tnear=tHit[0];
+	        tfar=tHit[1];
+	    }
+	    hit = 1;
+	}
+	    
+	Vec3 newIP = rayOrigin + (rayDirection * tnear);
+	if (sHit[0] == 0) {
+		normal = [newIP(1)-BC(1), 0, newIP(3)-BC(3)];
+	    if any(normal), normal=normal/norm(normal)
+	}
+	else if (sHit[0] == 1),
+	    normal = [0,-1,0]; % base
+	else,
+	    normal = [0,1,0]; % cap
+	end
+
+	if inside,
+	    normal = -normal;
+	end
+
+	newIP
+	normal%
 	vector<Vec3> points;
-	return points;
+	return points;*/
 }
 /*********************************************************************************************************************/
 
