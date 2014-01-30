@@ -23,6 +23,7 @@ public:
 	double length2() const;
 	double dot(const Vec3&) const;
 
+	Vec3 cross(const Vec3&) const;
 	Vec3& normalize();
 };
 

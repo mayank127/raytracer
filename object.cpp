@@ -74,8 +74,42 @@ Triangle::Triangle(Vec3 p1, Vec3 p2, Vec3 p3) {
 	this->p3 = p3;
 }
 
+
+// Source : http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
 vector<Vec3> Triangle::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
 	vector<Vec3> points;
-	return points;
+	Vec3 e1,e2,h,s,q;
+	double a,f,u,v;
+
+	e1 = p2 - p1;
+	e2 = p3 - p1;
+	h = rayDirection.cross(e2);
+	a = e1.dot(h);
+
+	if (a > -0.00001 && a < 0.00001)
+		return(points);
+
+	f = 1/a;
+	s = rayOrigin - p1;
+	u = f * (s.dot(h));
+
+	if (u < 0.0 || u > 1.0)
+		return(points);
+
+	q = s.cross(e1);
+	v = f * rayDirection.dot(q);
+
+	if (v < 0.0 || u + v > 1.0)
+		return(points);
+
+
+	t = f * e2.dot(q);
+
+	if (t > 0.00001) {
+		points.push_back(rayOrigin + (rayDirection * t));
+		return(points);
+	}
+	else
+		return (points);
 }
 /*********************************************************************************************************************/
