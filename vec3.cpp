@@ -6,41 +6,49 @@ Vec3::Vec3(){
 	y = 0;
 	z = 0;
 }
+
 Vec3::Vec3(double xn){
 	x = xn;
 	y = xn;
 	z = xn;
 }
+
 Vec3::Vec3(double xn, double yn, double zn){
 	x = xn;
 	y = yn;
 	z = zn;
 }
 
-Vec3 Vec3::operator * (const double& xn){
+Vec3 Vec3::operator * (const double& xn) const {
 	return Vec3(xn*x, xn*y, xn*z);
 }
-Vec3 Vec3::operator * (const Vec3& v){
+
+Vec3 Vec3::operator * (const Vec3& v) const {
 	return Vec3(v.x*x, v.y*y, v.z*z);
 }
-Vec3 Vec3::operator - (const Vec3& v){
+
+Vec3 Vec3::operator - (const Vec3& v) const {
 	return Vec3(x - v.x, y - v.y, z - v.z);
 }
-Vec3 Vec3::operator + (const Vec3& v){
+
+Vec3 Vec3::operator + (const Vec3& v) const {
 	return Vec3(x + v.x, y + v.y, z + v.z);
 }
+
 Vec3& Vec3::operator -= (const Vec3& v){
 	x -= v.x;
 	y -= v.y;
 	z -= v.z;
 	return *this;
 }
+
 Vec3& Vec3::operator += (const Vec3& v){
 	x += v.x;
 	y += v.y;
 	z += v.z;
 	return *this;
 }
+
 Vec3& Vec3::operator = (const Vec3& v){
 	x = v.x;
 	y = v.y;
@@ -48,13 +56,15 @@ Vec3& Vec3::operator = (const Vec3& v){
 	return *this;
 }
 
-double Vec3::length(){
+double Vec3::length() const {
 	return sqrt(length2());
 }
-double Vec3::length2(){
+
+double Vec3::length2() const {
 	return dot(*this);
 }
-double Vec3::dot(const Vec3& v){
+
+double Vec3::dot(const Vec3& v) const {
 	return v.x*x + v.y * y + v.z * z;
 }
 
