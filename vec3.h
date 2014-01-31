@@ -1,5 +1,5 @@
 #ifndef VEC3_H
-#define VECT_H
+#define VEC3_H
 
 class Vec3 {
 

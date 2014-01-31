@@ -13,3 +13,6 @@
 *.a
 a.out
 *.gch
+*.ppm
+ray-tracer
+obj/
