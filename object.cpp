@@ -23,8 +23,8 @@ Sphere::Sphere(Vec3 center, double radius, Vec3 surfaceColor, double transparenc
 	this->radius = radius;
 }
 
-vector<Vec3> Sphere::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
-	vector<Vec3> points;
+vector<double> Sphere::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
+	vector<double> points;
 	double a, b, c;
 	a = rayDirection.length2();
 	b = 2 * rayDirection.dot(rayOrigin - center);
@@ -33,19 +33,19 @@ vector<Vec3> Sphere::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDi
 	if (discriminant < 0) return points;
 	else if (discriminant==0) {
 		double t = (-1 * b)/(2 * a);
-		Vec3 p1 = rayOrigin + (rayDirection * t);
-		points.push_back(p1);
+		points.push_back(t);
 	}
 	else {
 		discriminant = sqrt(discriminant);
 		double t1 = ((-1 * b) + discriminant) / (2 * a);
 		double t2 = ((-1 * b) - discriminant) / (2 * a);
-		Vec3 p1 = rayOrigin + (rayDirection * t1);
-		Vec3 p2 = rayOrigin + (rayDirection * t2);
-		points.push_back(p1);
-		points.push_back(p2);
+		points.push_back(t1);
+		points.push_back(t2);
 	}
 	return points;
+}
+Vec3 Sphere::getNormal(const Vec3 point){
+	return (point - center).normalize();
 }
 /*********************************************************************************************************************/
 
@@ -59,7 +59,7 @@ Cylinder::Cylinder(Vec3 upVector, double radius, double height, Vec3 surfaceColo
 }
 
 // source : http://www.mathworks.com/matlabcentral/newsreader/view_thread/32952
-vector<Vec3> Cylinder::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
+vector<double> Cylinder::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
 
 	/*double a = (rayDirection.x*rayDirection.x) + (rayDirection.z * rayDirection.z);
 	double b = ((rayOrigin.x - center.x) * rayDirection.x) + ((rayOrigin.z - center.z) * rayDirection.z);
@@ -173,6 +173,7 @@ vector<Vec3> Cylinder::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &ray
 	vector<Vec3> points;
 	return points;*/
 }
+Vec3 Cylinder::getNormal(const Vec3 point){}
 /*********************************************************************************************************************/
 
 // Cone Object
@@ -185,9 +186,12 @@ Cone::Cone(Vec3 upVector, Vec3 inclineVector, double radius, double height, Vec3
 	this->height = height;
 }
 
-vector<Vec3> Cone::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
-	vector<Vec3> points;
+vector<double> Cone::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
+	vector<double> points;
 	return points;
+}
+Vec3 Cone::getNormal(const Vec3 point){
+
 }
 /*********************************************************************************************************************/
 
@@ -202,8 +206,8 @@ Triangle::Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 surfaceColor, double transpar
 
 
 // Source : http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
-vector<Vec3> Triangle::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
-	vector<Vec3> points;
+vector<double> Triangle::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
+	vector<double> points;
 	Vec3 e1,e2,h,s,q;
 	double a,f,u,v,t;
 
@@ -232,10 +236,13 @@ vector<Vec3> Triangle::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &ray
 	t = f * e2.dot(q);
 
 	if (t > 0.00001) {
-		points.push_back(rayOrigin + (rayDirection * t));
+		points.push_back(t);
 		return(points);
 	}
 	else
 		return (points);
+}
+Vec3 Triangle::getNormal(const Vec3 point){
+
 }
 /*********************************************************************************************************************/
