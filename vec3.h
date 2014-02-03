@@ -18,6 +18,7 @@ public:
 	Vec3& operator -= (const Vec3&);
 	Vec3& operator += (const Vec3&);
 	Vec3& operator = (const Vec3&);
+	bool operator == (const Vec3&)const;
 
 	double length() const;
 	double length2() const;
@@ -25,6 +26,7 @@ public:
 
 	Vec3 cross(const Vec3&) const;
 	Vec3& normalize();
+	void print();
 };
 
 

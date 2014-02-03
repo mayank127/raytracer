@@ -1,6 +1,8 @@
+#include <iostream>
 #include "vec3.h"
 #include <cmath>
 
+using namespace std;
 Vec3::Vec3(){
 	x = 0;
 	y = 0;
@@ -56,6 +58,11 @@ Vec3& Vec3::operator = (const Vec3& v){
 	return *this;
 }
 
+
+bool Vec3::operator == (const Vec3& v)const {
+	return (((*this)-v).length2()<0.1);
+}
+
 double Vec3::length() const {
 	return sqrt(length2());
 }
@@ -75,9 +82,12 @@ Vec3 Vec3::cross(const Vec3& v) const{
 	return Vec3(xn, yn, zn);
 }
 Vec3& Vec3::normalize(){
-	double l2 = length2();
-	x/=l2;
-	y/=l2;
-	z/=l2;
+	double l = length();
+	x/=l;
+	y/=l;
+	z/=l;
 	return *this;
+}
+void Vec3::print(){
+	cout<<x<<" "<<y<<" "<<z<<endl;
 }
