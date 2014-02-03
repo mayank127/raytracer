@@ -45,6 +45,7 @@ vector<double> Sphere::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &ray
 	return points;
 }
 Vec3 Sphere::getNormal(const Vec3 point){
+	cout<< "should be radus"<<(point-center).length2()<<endl;
 	return ((point - center).normalize());
 }
 /*********************************************************************************************************************/
