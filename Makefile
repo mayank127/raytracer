@@ -29,7 +29,7 @@ setup:
 
 $(TARGET): $(OBJS)
 	@$(ECHO) "Building executable..."
-	@$(CC) -o $@  $(OBJS) $(LIBS)
+	@$(CC) -o $@  -O3 $(OBJS) $(LIBS)
 
 -include $(OBJS:.o=.d)
 

@@ -31,10 +31,6 @@ vector<double> Sphere::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &ray
 	c = (rayOrigin - center).length2() - radius*radius;
 	double discriminant = b*b - 4*a*c;
 	if (discriminant < 0) return points;
-	/*else if (discriminant==0) {
-		double t = (-1 * b)/(2 * a);
-		points.push_back(t);
-	}*/
 	else {
 		discriminant = sqrt(discriminant);
 		double t1 = ((-1 * b) + discriminant) / (2 * a);
@@ -45,7 +41,6 @@ vector<double> Sphere::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &ray
 	return points;
 }
 Vec3 Sphere::getNormal(const Vec3 point){
-	cout<< "should be radus"<<(point-center).length2()<<endl;
 	return ((point - center).normalize());
 }
 /*********************************************************************************************************************/
