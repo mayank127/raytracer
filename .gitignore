@@ -16,3 +16,4 @@ a.out
 *.ppm
 ray-tracer
 obj/
+out*
