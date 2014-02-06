@@ -4,16 +4,19 @@
 #include <fstream>
 #include "vec3.h"
 #include "object.h"
+#include "light.h"
 #include <algorithm>
+#include <cstdlib>
 using namespace std;
 
 #define HEIGHT 480
 #define WIDTH 640
 #define RECURSION_DEPTH 5
+#define TOTAL_SAMPLE 16
 
 
 
-Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objects, vector<Vec3> lights){
+Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objects, vector<Light> lights){
 	double intersectPoint = INFINITY;
 	bool doesIntersect = false;
 	Object* intersectObject = NULL;
@@ -69,13 +72,14 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 	}
 
 	else{
-		for(vector<Vec3>::iterator light = lights.begin() ; light != lights.end(); ++light) {
-			Vec3 lightDir = point - (*light);
+		for(vector<Light>::iterator light = lights.begin() ; light != lights.end(); ++light) {
+			Vec3 pos = light->position;
+			Vec3 lightDir = point - pos;
 			lightDir.normalize();
 			bool shadow = false;
 			intersectPoint = INFINITY;
 			for(vector<Object*>::iterator it = objects.begin() ; it != objects.end(); ++it){
-				double point = (*it)->intersectionPoints(*light, lightDir);
+				double point = (*it)->intersectionPoints(pos, lightDir);
 				if(point<0) continue;
 				else {
 					shadow = true;
@@ -85,27 +89,46 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 					}
 				}
 			}
-			if(point == (*light + lightDir * intersectPoint)) shadow = false;
+			if(point == (pos + lightDir * intersectPoint)) shadow = false;
 			if(!shadow) {
-				finalColor += intersectObject->surfaceColor * max(0., -1*normal.dot(lightDir));
+				lightDir = lightDir * -1;
+				double colorFactor = normal.dot(lightDir);
+				if(colorFactor > 0){
+					finalColor += intersectObject->surfaceColor * light->colors * colorFactor * intersectObject->phongCoeffs.x * (1/(point - pos).length2());
+				}
+				if(intersectObject->objectType == SPECULAR){
+					Vec3 V = rayOrigin - point;
+					V.normalize();
+					double shine = normal.dot((V + lightDir).normalize());
+					if(shine > 0){
+						shine = pow(shine, 50) * intersectObject->phongCoeffs.y * (1/(point - pos).length2());
+						finalColor += intersectObject->surfaceColor * light->colors * shine;
+					}
+				}
 			}
 		}
 	}
 	return finalColor;
 }
 
-void init(vector<Object*> objects, vector<Vec3> lights){
+void init(vector<Object*> objects, vector<Light> lights){
 	double fov = 30, aspectRatio = WIDTH/(double) HEIGHT;
 	double angle = tan((M_PI/2)*fov/180);
 
 	vector<vector<Vec3> > image(WIDTH, vector<Vec3>(HEIGHT, Vec3()));
 	for(int j=0;j<HEIGHT;++j){
 		for(int i=0;i<WIDTH;++i){
-			double xx = (2 * ((i + 0.5) / WIDTH) - 1) * angle * aspectRatio;
-			double yy = (1 - 2 * ((j + 0.5) / HEIGHT)) * angle;
-			Vec3 rayDirection(xx, yy, -1);
-			rayDirection.normalize();
-			image[i][j] = sendRay(Vec3(0), rayDirection, 0, objects, lights);
+			image[i][j] = Vec3(0);
+			for(int sample = 0; sample<TOTAL_SAMPLE; sample++){
+				double ii = i + rand()/(double)RAND_MAX;
+				double jj = j + rand()/(double)RAND_MAX;
+				double xx = (2 * ((ii + 0.5) / WIDTH) - 1) * angle * aspectRatio;
+				double yy = (1 - 2 * ((jj + 0.5) / HEIGHT)) * angle;
+				Vec3 rayDirection(xx, yy, -1);
+				rayDirection.normalize();
+				image[i][j]+= sendRay(Vec3(0), rayDirection, 0, objects, lights);
+			}
+			image[i][j] = image[i][j] * (1/(double)TOTAL_SAMPLE);
 		}
 	}
 
@@ -123,11 +146,11 @@ void init(vector<Object*> objects, vector<Vec3> lights){
 }
 int main(){
 	vector<Object*> objects;
-	vector<Vec3> lights;
+	vector<Light> lights;
 	Sphere sp1(Vec3(0,-10004,-20), 10000, Vec3(0.2,0.2,0.2), 0, DIFFUSED);
 	Sphere sp2(Vec3(0,0,-20), 4, Vec3(1,0.32,0.36), 0, SPECULAR);
-	Cylinder cy1(Vec3(0,-5,-30), Vec3(0,1,1), 2, 10, Vec3(1,0.32,0.36), 0, SPECULAR);
-	Cone co1(Vec3(0,0,-20), Vec3(0,1,0),0.5, 3, Vec3(1,0.32,0.36), 0, SPECULAR);
+	Cylinder cy1(Vec3(0,-5,-30), Vec3(0,1,0), 2, 10, Vec3(1,0.32,0.36), 0, SPECULAR);
+	Cone co1(Vec3(0,-3,-20), Vec3(0,1,0),0.5, 3, Vec3(1,0.32,0.36), 0, SPECULAR);
 	Triangle tr1(Vec3(0,-10,-50), Vec3(10,5,-50),Vec3(15, -10,-50), Vec3(1,0.32,0.36), 0.0, SPECULAR);
 	Sphere sp3(Vec3(5,-1,-15), 2, Vec3(0.9,0.76,0.46), 0, SPECULAR);
 	Sphere sp4(Vec3(5, 0, -25),3, Vec3(0.65,0.77,0.97), 0, SPECULAR);
@@ -140,7 +163,7 @@ int main(){
 	objects.push_back(&sp3);
 	objects.push_back(&sp4);
 	objects.push_back(&sp5);
-	lights.push_back(Vec3(20,20,10));
-	lights.push_back(Vec3(-20,20,10));
+	lights.push_back(Light(Vec3(2,2,1), Vec3(30,30,3000)));
+	// lights.push_back(Light(Vec3(-20,20,10), Vec3(0,1,3)));
 	init(objects, lights);
 }

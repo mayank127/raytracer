@@ -8,10 +8,11 @@ using namespace std;
 // Object
 /*********************************************************************************************************************/
 
-Object::Object(Vec3 surfaceColor, double transparency, Type objectType){
+Object::Object(Vec3 surfaceColor, double transparency, Type objectType, Vec3 phongCoeffs){
 	this->surfaceColor = surfaceColor;
 	this->transparency = transparency;
 	this->objectType = objectType;
+	this->phongCoeffs = phongCoeffs;
 }
 
 /*********************************************************************************************************************/

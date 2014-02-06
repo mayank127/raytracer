@@ -14,8 +14,9 @@ public:
 	Vec3 surfaceColor;
 	double transparency;
 	Type objectType;
+	Vec3 phongCoeffs;
 
-	Object(Vec3 surfaceColor, double transparency, Type objectType);
+	Object(Vec3 surfaceColor, double transparency, Type objectType, Vec3 phongCoeffs=Vec3(0.5,0.5,0.5));
 	virtual double intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) = 0;
 	virtual Vec3 getNormal(const Vec3 point) = 0;
 };
