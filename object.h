@@ -48,10 +48,11 @@ class Cone : public Object {
 
 public:
 
-	double radius, height;
-	Vec3 upVector, inclineVector;
+	double radius, height, alpha;
+	Vec3 upVector;
+	Vec3 center;
 
-	Cone(Vec3 upVector, Vec3 inclineVector, double radius, double height, Vec3 surfaceColor, double transparency, Type objectType);
+	Cone(Vec3 center, Vec3 upVector, double alpha, double height, Vec3 surfaceColor, double transparency, Type objectType);
 	double intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection);
 	Vec3 getNormal(const Vec3 point);
 };

@@ -59,7 +59,7 @@ Cylinder::Cylinder(Vec3 center, Vec3 upVector, double radius, double height, Vec
 	this->height = height;
 }
 
-// source :http://mrl.nyu.edu/~dzorin/cg05/lecture12.pdf
+// source : http://mrl.nyu.edu/~dzorin/rend05/lecture2.pdf
 double Cylinder::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
 	vector<double> points;
 	Vec3 alpha = upVector * rayDirection.dot(upVector);
@@ -126,20 +126,76 @@ Vec3 Cylinder::getNormal(const Vec3 point){
 
 // Cone Object
 /*********************************************************************************************************************/
-Cone::Cone(Vec3 upVector, Vec3 inclineVector, double radius, double height, Vec3 surfaceColor, double transparency, Type objectType)
+Cone::Cone(Vec3 center, Vec3 upVector, double alpha, double height, Vec3 surfaceColor, double transparency, Type objectType)
 	:Object(surfaceColor, transparency, objectType) {
-	this->upVector = upVector;
-	this->inclineVector = inclineVector;
-	this->radius = radius;
+	this->center = center;
+	this->upVector = upVector.normalize();
+	this->alpha = alpha;
+	this->radius = height * tan(alpha);
 	this->height = height;
 }
-
+// source : http://mrl.nyu.edu/~dzorin/rend05/lecture2.pdf
 double Cone::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
-	double point = -1;
-	return point;
+	vector<double> points;
+	double cos2a = cos(alpha)*cos(alpha);
+	double sin2a = 1 - cos2a;
+	Vec3 pa = center + upVector * height;
+	Vec3 va = upVector * -1;
+	Vec3 deltaP = (rayOrigin - pa);
+
+	double c1 = rayDirection.dot(va);
+	Vec3 c2 = va * c1;
+	double c3 = deltaP.dot(va);
+	Vec3 c4 = va * c3;
+
+	double a = cos2a * (rayDirection - c2).length2() - sin2a * c1 * c1;
+	double b = 2* cos2a * (rayDirection - c2).dot(deltaP - c4) - 2 * sin2a * (c1 * c3);
+	double c = cos2a * (deltaP - c4).length2() - sin2a * (c3 * c3);
+
+
+	double discriminant = b*b - 4*a*c;
+	if (discriminant < 0) return -1;
+	else {
+		discriminant = sqrt(discriminant);
+		double t1 = ((-1 * b) + discriminant) / (2 * a);
+		double t2 = ((-1 * b) - discriminant) / (2 * a);
+		if(t1>=0){
+			if(upVector.dot((rayOrigin - center) + rayDirection * t1)>0 && upVector.dot((rayOrigin - pa) + rayDirection * t1)<0)
+				points.push_back(t1);
+		}
+		if(t2>=0)
+			if(upVector.dot((rayOrigin - center) + rayDirection * t2)>0 && upVector.dot((rayOrigin - pa) + rayDirection * t2)<0)
+				points.push_back(t2);
+	}
+
+	float denom = rayDirection.dot(upVector);
+	if (denom > 1e-6) {
+		Vec3 co = center - rayOrigin;
+		double t3 = co.dot(upVector) / denom;
+		if(t3 > 0 && (rayDirection * t3 - co).length2() <= radius*radius)
+			points.push_back(t3);
+	}
+
+	double minT = INFINITY;
+	bool flag = false;
+	for(int i=0;i<points.size();i++){
+		if(minT > points[i]) {
+			minT = points[i];
+			flag = true;
+		}
+	}
+	if(flag)
+		return minT;
+	else
+		return -1;
 }
 Vec3 Cone::getNormal(const Vec3 point){
-
+	if(abs((point - center).dot(upVector)) < 1e-6){
+		return upVector * -1;
+	}
+	Vec3 top = center + upVector * height;
+	Vec3 perp = (upVector * -1).cross(point - top);
+	return ((point - top).cross(perp)).normalize();
 }
 /*********************************************************************************************************************/
 
@@ -190,6 +246,6 @@ double Triangle::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirect
 		return (-1);
 }
 Vec3 Triangle::getNormal(const Vec3 point){
-
+	return (p2 -p1).cross(p3 - p1).normalize();
 }
 /*********************************************************************************************************************/

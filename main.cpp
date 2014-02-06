@@ -87,7 +87,7 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 			}
 			if(point == (*light + lightDir * intersectPoint)) shadow = false;
 			if(!shadow) {
-				finalColor += intersectObject->surfaceColor * max(0., -1*normal.dot(lightDir)) * 3;
+				finalColor += intersectObject->surfaceColor * max(0., -1*normal.dot(lightDir));
 			}
 		}
 	}
@@ -126,15 +126,21 @@ int main(){
 	vector<Vec3> lights;
 	Sphere sp1(Vec3(0,-10004,-20), 10000, Vec3(0.2,0.2,0.2), 0, DIFFUSED);
 	Sphere sp2(Vec3(0,0,-20), 4, Vec3(1,0.32,0.36), 0, SPECULAR);
-	Cylinder cy1(Vec3(0,-5,-30), Vec3(0,1,0), 2, 10, Vec3(1,0.32,0.36), 0, SPECULAR);
+	Cylinder cy1(Vec3(0,-5,-30), Vec3(0,1,1), 2, 10, Vec3(1,0.32,0.36), 0, SPECULAR);
+	Cone co1(Vec3(0,0,-20), Vec3(0,1,0),0.5, 3, Vec3(1,0.32,0.36), 0, SPECULAR);
+	Triangle tr1(Vec3(0,-10,-50), Vec3(10,5,-50),Vec3(15, -10,-50), Vec3(1,0.32,0.36), 0.0, SPECULAR);
 	Sphere sp3(Vec3(5,-1,-15), 2, Vec3(0.9,0.76,0.46), 0, SPECULAR);
 	Sphere sp4(Vec3(5, 0, -25),3, Vec3(0.65,0.77,0.97), 0, SPECULAR);
 	Sphere sp5(Vec3(-5,0,-15), 3, Vec3(0.9), 0, SPECULAR);
 	objects.push_back(&sp1);
+	objects.push_back(&tr1);
+	// objects.push_back(&sp2);
 	objects.push_back(&cy1);
+	objects.push_back(&co1);
 	objects.push_back(&sp3);
 	objects.push_back(&sp4);
 	objects.push_back(&sp5);
 	lights.push_back(Vec3(20,20,10));
+	lights.push_back(Vec3(-20,20,10));
 	init(objects, lights);
 }
