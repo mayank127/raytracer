@@ -12,7 +12,7 @@ PROJECT_ROOT=.
 SRCDIR = $(PROJECT_ROOT)
 OBJDIR = $(PROJECT_ROOT)/obj
 
-LIBS =  -lGL -lGLU -lglut -g
+LIBS =  -lGL -lGLU -lglut -g -std=c++0x
 TARGET = ray-tracer
 
 SRCS := $(wildcard $(SRCDIR)/*.cpp)

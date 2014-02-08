@@ -5,6 +5,7 @@
 #include "vec3.h"
 #include "object.h"
 #include "light.h"
+#include "matrix.h"
 #include <algorithm>
 #include <cstdlib>
 using namespace std;
@@ -26,6 +27,7 @@ struct Camera {
 };
 
 Camera camera;
+
 
 Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objects, vector<Light> lights){
 	double intersectPoint = INFINITY;
@@ -213,7 +215,6 @@ int main(int argc, char[] argv){
 	}
 	vector<Object*> objects;
 	vector<Light> lights;
-
 
 	Sphere sp1(Vec3(0,-10004,-20), 10000, Vec3(0.2,0.2,0.2), 0, DIFFUSED);
 	Sphere sp2(Vec3(0,0,-20), 4, Vec3(1,0.32,0.36), 0, SPECULAR);
