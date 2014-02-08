@@ -19,7 +19,7 @@ Object::Object(Vec3 surfaceColor, double transparency, Type objectType, Vec3 pho
 // Sphere Object
 /*********************************************************************************************************************/
 Sphere::Sphere(Vec3 center, double radius, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
-	:Object(surfaceColor, transparency, objectType) {
+	:Object(surfaceColor, transparency, objectType, phongCoeffs) {
 	this->transformMatrix = Matrix(mat);
 	this->inverseMatrix = (this->transformMatrix).inverse();
 	this->transposeMatrix = (this->inverseMatrix).transpose();
@@ -52,10 +52,17 @@ double Sphere::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
 		points.push_back(t2);
 	}
 	double minT = INFINITY;
+	bool flag = false;
 	for(int i=0;i<points.size();i++){
-		if(minT > points[i]) minT = points[i];
+		if(points[i]>=0 && minT > points[i]) {
+			minT = points[i];
+			flag = true;
+		}
 	}
-	return minT/Ird;
+	if (flag)
+		return minT/Ird;
+	else
+		return -1;
 }
 Vec3 Sphere::getNormal(const Vec3 point){
 	// point.print();
@@ -69,7 +76,7 @@ Vec3 Sphere::getNormal(const Vec3 point){
 // Cylinder Object
 /*********************************************************************************************************************/
 Cylinder::Cylinder(Vec3 center, Vec3 upVector, double radius, double height, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
-	:Object(surfaceColor, transparency, objectType) {
+	:Object(surfaceColor, transparency, objectType, phongCoeffs) {
 	this->transformMatrix = Matrix(mat);
 	this->inverseMatrix = (this->transformMatrix).inverse();
 	this->transposeMatrix = (this->inverseMatrix).transpose();
@@ -129,7 +136,7 @@ double Cylinder::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
 	double minT = INFINITY;
 	bool flag = false;
 	for(int i=0;i<points.size();i++){
-		if(minT > points[i]) {
+		if(minT > points[i] && points[i]>=0) {
 			minT = points[i];
 			flag = true;
 		}
@@ -155,7 +162,7 @@ Vec3 Cylinder::getNormal(const Vec3 p){
 // Cone Object
 /*********************************************************************************************************************/
 Cone::Cone(Vec3 center, Vec3 upVector, double alpha, double height, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
-	:Object(surfaceColor, transparency, objectType) {
+	:Object(surfaceColor, transparency, objectType, phongCoeffs) {
 	this->transformMatrix = Matrix(mat);
 	this->inverseMatrix = (this->transformMatrix).inverse();
 	this->transposeMatrix = (this->inverseMatrix).transpose();
@@ -217,7 +224,7 @@ double Cone::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
 	double minT = INFINITY;
 	bool flag = false;
 	for(int i=0;i<points.size();i++){
-		if(minT > points[i]) {
+		if(minT > points[i] && points[i]>=0) {
 			minT = points[i];
 			flag = true;
 		}
@@ -229,7 +236,7 @@ double Cone::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
 }
 Vec3 Cone::getNormal(const Vec3 p){
 	Vec3 point = inverseMatrix.transform(p, 1);
-	if(abs((point - center).dot(upVector)) < 1e-6){
+	if(abs((point - center).dot(upVector)) < 1e-4){
 		return transformMatrix.transform(upVector * -1, 0).normalize();
 	}
 	Vec3 top = center + upVector * height;
@@ -241,7 +248,7 @@ Vec3 Cone::getNormal(const Vec3 p){
 // Triangle Object
 /*********************************************************************************************************************/
 Triangle::Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
-	:Object(surfaceColor, transparency, objectType) {
+	:Object(surfaceColor, transparency, objectType, phongCoeffs) {
 	this->transformMatrix = Matrix(mat);
 	this->inverseMatrix = (this->transformMatrix).inverse();
 	this->transposeMatrix = (this->inverseMatrix).transpose();

@@ -84,7 +84,6 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 		finalColor += (reflectionColor * fresneleffect + refractionColor * (1- fresneleffect)) * intersectObject->surfaceColor;
 
 	}
-
 	else{
 		for(vector<Light>::iterator light = lights.begin() ; light != lights.end(); ++light) {
 			Vec3 pos = light->position;
