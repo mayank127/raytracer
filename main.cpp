@@ -365,6 +365,6 @@ int main(int argc, char** argv){
 			break;
 		}
 	}
-	cout<<objects.size();
+	cout<<objects.size()<<endl;
 	init(objects, lights);
 }
