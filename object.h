@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "vec3.h"
+#include "matrix.h"
 using namespace std;
 
 enum Type {SPECULAR, DIFFUSED}; 
@@ -15,6 +16,7 @@ public:
 	double transparency;
 	Type objectType;
 	Vec3 phongCoeffs;
+	Matrix transformMatrix;
 
 	Object(Vec3 surfaceColor, double transparency, Type objectType, Vec3 phongCoeffs=Vec3(0.5,0.5,0.5));
 	virtual double intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) = 0;
@@ -28,7 +30,7 @@ public:
 	Vec3 center;
 	double radius;
 
-	Sphere(Vec3 center, double radius, Vec3 surfaceColor, double transparency, Type objectType);
+	Sphere(Vec3 center, double radius, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs=Vec3(0.5,0.5,0.5));
 	double intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection);
 	Vec3 getNormal(const Vec3 point);
 };
@@ -40,7 +42,7 @@ public:
 	double radius, height;
 	Vec3 upVector;
 
-	Cylinder(Vec3 center, Vec3 upVector, double radius, double height, Vec3 surfaceColor, double transparency, Type objectType);
+	Cylinder(Vec3 center, Vec3 upVector, double radius, double height, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs=Vec3(0.5,0.5,0.5));
 	double intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection);
 	Vec3 getNormal(const Vec3 point);
 };
@@ -53,7 +55,7 @@ public:
 	Vec3 upVector;
 	Vec3 center;
 
-	Cone(Vec3 center, Vec3 upVector, double alpha, double height, Vec3 surfaceColor, double transparency, Type objectType);
+	Cone(Vec3 center, Vec3 upVector, double alpha, double height, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs=Vec3(0.5,0.5,0.5));
 	double intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection);
 	Vec3 getNormal(const Vec3 point);
 };
@@ -64,7 +66,7 @@ public:
 
 	Vec3 p1, p2, p3;
 
-	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 surfaceColor, double transparency, Type objectType);
+	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs=Vec3(0.5,0.5,0.5));
 	double intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection);
 	Vec3 getNormal(const Vec3 point);
 };

@@ -18,8 +18,9 @@ Object::Object(Vec3 surfaceColor, double transparency, Type objectType, Vec3 pho
 /*********************************************************************************************************************/
 // Sphere Object
 /*********************************************************************************************************************/
-Sphere::Sphere(Vec3 center, double radius, Vec3 surfaceColor, double transparency, Type objectType)
+Sphere::Sphere(Vec3 center, double radius, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
 	:Object(surfaceColor, transparency, objectType) {
+	this->transformMatrix = Matrix(mat);
 	this->center = center;
 	this->radius = radius;
 }
@@ -52,8 +53,9 @@ Vec3 Sphere::getNormal(const Vec3 point){
 
 // Cylinder Object
 /*********************************************************************************************************************/
-Cylinder::Cylinder(Vec3 center, Vec3 upVector, double radius, double height, Vec3 surfaceColor, double transparency, Type objectType)
+Cylinder::Cylinder(Vec3 center, Vec3 upVector, double radius, double height, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
 	:Object(surfaceColor, transparency, objectType) {
+	this->transformMatrix = Matrix(mat);
 	this->center = center;
 	this->upVector = upVector.normalize();
 	this->radius = radius;
@@ -127,8 +129,9 @@ Vec3 Cylinder::getNormal(const Vec3 point){
 
 // Cone Object
 /*********************************************************************************************************************/
-Cone::Cone(Vec3 center, Vec3 upVector, double alpha, double height, Vec3 surfaceColor, double transparency, Type objectType)
+Cone::Cone(Vec3 center, Vec3 upVector, double alpha, double height, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
 	:Object(surfaceColor, transparency, objectType) {
+	this->transformMatrix = Matrix(mat);		
 	this->center = center;
 	this->upVector = upVector.normalize();
 	this->alpha = alpha;
@@ -202,8 +205,9 @@ Vec3 Cone::getNormal(const Vec3 point){
 
 // Triangle Object
 /*********************************************************************************************************************/
-Triangle::Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 surfaceColor, double transparency, Type objectType)
+Triangle::Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
 	:Object(surfaceColor, transparency, objectType) {
+	this->transformMatrix = Matrix(mat);
 	this->p1 = p1;
 	this->p2 = p2;
 	this->p3 = p3;
