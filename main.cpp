@@ -29,11 +29,12 @@ struct Camera {
 
 Camera camera;
 
-
+/* function for recursive raytracer*/
 Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objects, vector<Light> lights){
 	double intersectPoint = INFINITY;
 	bool doesIntersect = false;
 	Object* intersectObject = NULL;
+	/*checking for nearest intersection*/
 	for(vector<Object*>::iterator it = objects.begin() ; it != objects.end(); ++it) {
 		double point = (*it)->intersectionPoints(rayOrigin, rayDirection);
 		if(point<0) continue;
@@ -45,28 +46,35 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 			}
 		}
 	}
-
+	/*no intersection => background color*/
 	if(!doesIntersect) return Vec3(2);
+
+	/*if there is intersection*/
 	Vec3 point = rayOrigin + rayDirection * intersectPoint;
 	Vec3 normal = intersectObject->getNormal(point);
 	Vec3 finalColor(0);
 
 	bool isIn = false;
 	if(normal.dot(rayDirection)>0) {
+		/* ray is inside of the object not valide for triangles - for them one side is in*/
 		normal = normal * -1;
 		isIn = true;
 	}
 
+	/*case if specular object and not reached depth of recursion*/
 	if(intersectObject->objectType == SPECULAR && level < camera.recursion_depth) {
+
 		Vec3 reflectionDir = rayDirection - (normal * 2 * rayDirection.dot(normal));
 		reflectionDir.normalize();
+		/*coloring the specular object accoring to direction of ray with respect to normal*/
 		double facingratio = -1 * rayDirection.dot(normal);
 		double fresneleffect = 0.1 + pow(1 - facingratio, 3) * 0.9;
 
+		/*recursion call for reflected ray*/
 		Vec3 reflectionColor = sendRay(point + reflectionDir * 0.01 , reflectionDir, level + 1, objects, lights);
 
 		Vec3 refractionColor(0);
-
+		/*checking for refracting object if yes than recursion call for refraction*/
 		if(intersectObject->transparency > 0){
 			double n1 = 1;
 			double n2 = intersectObject->transparency;
@@ -81,11 +89,14 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 				refractionColor = sendRay(point + refractionDir * 0.01, refractionDir, level + 1, objects, lights); 
 			}
 		}
+		/*final color -> linear combination of refracted and reflected ray * surface color */
 		finalColor += (reflectionColor * fresneleffect + refractionColor * (1- fresneleffect)) * intersectObject->surfaceColor;
 
 	}
 	else{
+		/*case if diffused object or recursion depth reached*/
 		for(vector<Light>::iterator light = lights.begin() ; light != lights.end(); ++light) {
+			/*checking if ray from light to object is intervened then shadow else light*/
 			Vec3 pos = light->position;
 			Vec3 lightDir = point - pos;
 			lightDir.normalize();
@@ -107,8 +118,10 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 				lightDir = lightDir * -1;
 				double colorFactor = normal.dot(lightDir);
 				if(colorFactor > 0){
+					/*if diffused object only then phong model for adding up diffused component*/
 					finalColor += intersectObject->surfaceColor * light->colors * colorFactor * intersectObject->phongCoeffs.x * (1/(point - pos).length2());
 				}
+				/*if specular object then specular light is added it shows glossiness*/
 				if(intersectObject->objectType == SPECULAR){
 					Vec3 V = rayOrigin - point;
 					V.normalize();
@@ -125,6 +138,7 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 }
 
 void init(vector<Object*> objects, vector<Light> lights){
+	/*Making view transformation matrix using eye, up vector, look at vector*/
 	Vec3 n = (camera.pos - camera.lookAt).normalize();
 	Vec3 u = camera.up.cross(n).normalize();
 	Vec3 v = n.cross(u);
@@ -134,7 +148,13 @@ void init(vector<Object*> objects, vector<Light> lights){
 	e.y = v.dot(camera.pos)*-1;
 	e.z = n.dot(camera.pos)*-1;
 
-
+	/*
+	Avw = 
+		[u.x, u.y, u.z, e.x]
+		[v.x, v.y, v.z, e.y]
+		[n.x, n.y, n.z, e.z]
+		[ 0,   0, 	0,   1 ]	
+	*/
 	double V[16] = {u.x, u.y, u.z, e.x, v.x, v.y, v.z, e.y, n.x, n.y, n.z, e.z, 0, 0, 0, 1};
 	Matrix viewingTransform(V);
 
@@ -146,19 +166,26 @@ void init(vector<Object*> objects, vector<Light> lights){
 		for(int i=0;i<camera.width;++i){
 			image[i][j] = Vec3(0);
 			for(int sample = 0; sample<camera.total_samples; sample++){
+				/*Random number between pixels for super sampling*/
+
 				double ii = i + rand()/(double)RAND_MAX;
 				double jj = j + rand()/(double)RAND_MAX;
 				double xx = (2 * ((ii + 0.5) / camera.width) - 1) * angle * aspectRatio;
 				double yy = (1 - 2 * ((jj + 0.5) / camera.height)) * angle;
 				Vec3 rayDirection(xx, yy, -1);
+
+				/*ray transformation to world coordinate system*/
 				rayDirection = viewingTransform.transform(rayDirection, 0);
 				rayDirection.normalize();
+
+				/*starting of ray tracer*/
 				image[i][j]+= sendRay(Vec3(0), rayDirection, 0, objects, lights);
 			}
 			image[i][j] = image[i][j] * (1/(double)camera.total_samples);
 		}
 	}
 
+	/*writing into file image.ppm*/
 	ofstream ofs("./image.ppm", ios::out);
 	ofs << "P3\n" << camera.width << " " << camera.height << "\n255\n";
 	for(int j=0;j<camera.height;j++) {
@@ -176,6 +203,7 @@ int main(int argc, char** argv){
 		cout<<"Usage: "<<argv[0]<<" scene_description_file"<<endl;
 		return -1;
 	}
+	/*Opening and parsing of scene description file*/
 	ifstream ifs;
 	ifs.open(argv[1], ios::in);
 	if(!ifs.is_open()) {
@@ -365,6 +393,5 @@ int main(int argc, char** argv){
 			break;
 		}
 	}
-	cout<<objects.size()<<endl;
 	init(objects, lights);
 }

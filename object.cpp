@@ -26,10 +26,13 @@ Sphere::Sphere(Vec3 center, double radius, Vec3 surfaceColor, double transparenc
 	this->center = center;
 	this->radius = radius;
 }
-//p = ro + t * rd
 
-// Ip = Iro + t *|Ird|* Ird/|Ird|
+/*
+	Sphere intersection
+		- solving equation for a point on ray which is at distance r from center
+*/
 double Sphere::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
+	/*Transformation done to ray origin and ray direction for world  -> object coordinates*/
 	Vec3 rayOrigin = ro;
 	Vec3 rayDirection = rd;
 	rayOrigin = inverseMatrix.transform(ro, 1);
@@ -59,16 +62,15 @@ double Sphere::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
 			flag = true;
 		}
 	}
+
 	if (flag)
 		return minT/Ird;
 	else
 		return -1;
 }
 Vec3 Sphere::getNormal(const Vec3 point){
-	// point.print();
+	/*for normal first convert p to object space than find normal and then normal converted to world space and normalized*/
 	Vec3 p = inverseMatrix.transform(point, 1);
-	// p.print();
-	// cout<<(p - center).length2()<<endl;
 	return transposeMatrix.transform((p - center).normalize(), 0).normalize();
 }
 /*********************************************************************************************************************/
@@ -87,6 +89,12 @@ Cylinder::Cylinder(Vec3 center, Vec3 upVector, double radius, double height, Vec
 }
 
 // source : http://mrl.nyu.edu/~dzorin/rend05/lecture2.pdf
+/*
+	Cylinder Intersection 
+		- First solving a point on ray at distance r from a infinite line which is axis of cylinder
+		- then cut cylinder through two planes and check if the interscetion is still there
+		- if not then check if intersection on plane is within range of cylinder
+*/
 double Cylinder::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
 	Vec3 rayOrigin = ro;
 	Vec3 rayDirection = rd;
@@ -173,6 +181,13 @@ Cone::Cone(Vec3 center, Vec3 upVector, double alpha, double height, Vec3 surface
 	this->height = height;
 }
 // source : http://mrl.nyu.edu/~dzorin/rend05/lecture2.pdf
+
+/*
+	Cone Intersection 
+		- First solving a point on ray at for an infinite cone with apex at center2
+		- then cut cone through two planes and check if the interscetion is still there
+		- if not then check if intersection on plane is within range of cone
+*/
 double Cone::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
 	Vec3 rayOrigin = ro;
 	Vec3 rayDirection = rd;
@@ -259,6 +274,7 @@ Triangle::Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 surfaceColor, double transpar
 
 
 // Source : http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
+/*Triangle intersection*/
 double Triangle::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
 	Vec3 rayOrigin = ro;
 	Vec3 rayDirection = rd;
