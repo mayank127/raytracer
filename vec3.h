@@ -27,7 +27,7 @@ public:
 	Vec3 cross(const Vec3&) const;
 	Vec3& normalize();
 	Vec3 project(const Vec3&) const;
-	void print();
+	void print() const;
 };
 
 

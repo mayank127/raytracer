@@ -92,6 +92,6 @@ Vec3& Vec3::normalize(){
 Vec3 Vec3::project(const Vec3& v) const{
 	return (v * (this->dot(v)/v.length2()));
 }
-void Vec3::print(){
+void Vec3::print() const{
 	cout<<x<<" "<<y<<" "<<z<<endl;
 }

@@ -21,11 +21,22 @@ Object::Object(Vec3 surfaceColor, double transparency, Type objectType, Vec3 pho
 Sphere::Sphere(Vec3 center, double radius, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
 	:Object(surfaceColor, transparency, objectType) {
 	this->transformMatrix = Matrix(mat);
+	this->inverseMatrix = (this->transformMatrix).inverse();
+	this->transposeMatrix = (this->inverseMatrix).transpose();
 	this->center = center;
 	this->radius = radius;
 }
+//p = ro + t * rd
 
-double Sphere::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
+// Ip = Iro + t *|Ird|* Ird/|Ird|
+double Sphere::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
+	Vec3 rayOrigin = ro;
+	Vec3 rayDirection = rd;
+	rayOrigin = inverseMatrix.transform(ro, 1);
+	rayDirection = inverseMatrix.transform(rd, 0);
+	double Ird = rayDirection.length();
+	rayDirection.normalize();
+
 	vector<double> points;
 	double a, b, c;
 	a = rayDirection.length2();
@@ -44,10 +55,14 @@ double Sphere::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirectio
 	for(int i=0;i<points.size();i++){
 		if(minT > points[i]) minT = points[i];
 	}
-	return minT;
+	return minT/Ird;
 }
 Vec3 Sphere::getNormal(const Vec3 point){
-	return ((point - center).normalize());
+	// point.print();
+	Vec3 p = inverseMatrix.transform(point, 1);
+	// p.print();
+	// cout<<(p - center).length2()<<endl;
+	return transposeMatrix.transform((p - center).normalize(), 0).normalize();
 }
 /*********************************************************************************************************************/
 
@@ -56,6 +71,8 @@ Vec3 Sphere::getNormal(const Vec3 point){
 Cylinder::Cylinder(Vec3 center, Vec3 upVector, double radius, double height, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
 	:Object(surfaceColor, transparency, objectType) {
 	this->transformMatrix = Matrix(mat);
+	this->inverseMatrix = (this->transformMatrix).inverse();
+	this->transposeMatrix = (this->inverseMatrix).transpose();
 	this->center = center;
 	this->upVector = upVector.normalize();
 	this->radius = radius;
@@ -63,7 +80,14 @@ Cylinder::Cylinder(Vec3 center, Vec3 upVector, double radius, double height, Vec
 }
 
 // source : http://mrl.nyu.edu/~dzorin/rend05/lecture2.pdf
-double Cylinder::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
+double Cylinder::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
+	Vec3 rayOrigin = ro;
+	Vec3 rayDirection = rd;
+	rayOrigin = inverseMatrix.transform(ro, 1);
+	rayDirection = inverseMatrix.transform(rd, 0);
+	double Ird = rayDirection.length();
+	rayDirection.normalize();
+
 	vector<double> points;
 	Vec3 alpha = upVector * rayDirection.dot(upVector);
 	Vec3 deltaP = (rayOrigin - center);
@@ -111,19 +135,20 @@ double Cylinder::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirect
 		}
 	}
 	if(flag)
-		return minT;
+		return minT/Ird;
 	else
 		return -1;
 }
-Vec3 Cylinder::getNormal(const Vec3 point){
+Vec3 Cylinder::getNormal(const Vec3 p){
+	Vec3 point = inverseMatrix.transform(p, 1);
 	Vec3 co = point - center;
 	Vec3 co2 = co - upVector*height;
 	if(co.length2() <= radius * radius)
-		return (upVector.normalize());
+		return transposeMatrix.transform(upVector, 0).normalize();
 	if(co2.length2() <= radius * radius)
-		return upVector.normalize();
+		return transposeMatrix.transform(upVector, 0).normalize();
 	Vec3 normal = co - co.project(upVector);
-	return normal.normalize();
+	return transposeMatrix.transform(normal, 0).normalize();
 }
 /*********************************************************************************************************************/
 
@@ -131,7 +156,9 @@ Vec3 Cylinder::getNormal(const Vec3 point){
 /*********************************************************************************************************************/
 Cone::Cone(Vec3 center, Vec3 upVector, double alpha, double height, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
 	:Object(surfaceColor, transparency, objectType) {
-	this->transformMatrix = Matrix(mat);		
+	this->transformMatrix = Matrix(mat);
+	this->inverseMatrix = (this->transformMatrix).inverse();
+	this->transposeMatrix = (this->inverseMatrix).transpose();
 	this->center = center;
 	this->upVector = upVector.normalize();
 	this->alpha = alpha;
@@ -139,7 +166,14 @@ Cone::Cone(Vec3 center, Vec3 upVector, double alpha, double height, Vec3 surface
 	this->height = height;
 }
 // source : http://mrl.nyu.edu/~dzorin/rend05/lecture2.pdf
-double Cone::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
+double Cone::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
+	Vec3 rayOrigin = ro;
+	Vec3 rayDirection = rd;
+	rayOrigin = inverseMatrix.transform(ro, 1);
+	rayDirection = inverseMatrix.transform(rd, 0);
+	double Ird = rayDirection.length();
+	rayDirection.normalize();
+
 	vector<double> points;
 	double cos2a = cos(alpha)*cos(alpha);
 	double sin2a = 1 - cos2a;
@@ -189,17 +223,18 @@ double Cone::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection)
 		}
 	}
 	if(flag)
-		return minT;
+		return minT/Ird;
 	else
 		return -1;
 }
-Vec3 Cone::getNormal(const Vec3 point){
+Vec3 Cone::getNormal(const Vec3 p){
+	Vec3 point = inverseMatrix.transform(p, 1);
 	if(abs((point - center).dot(upVector)) < 1e-6){
-		return upVector * -1;
+		return transformMatrix.transform(upVector * -1, 0).normalize();
 	}
 	Vec3 top = center + upVector * height;
 	Vec3 perp = (upVector * -1).cross(point - top);
-	return ((point - top).cross(perp)).normalize();
+	return transposeMatrix.transform(((point - top).cross(perp)).normalize(), 0).normalize();
 }
 /*********************************************************************************************************************/
 
@@ -208,6 +243,8 @@ Vec3 Cone::getNormal(const Vec3 point){
 Triangle::Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 surfaceColor, double transparency, Type objectType, Matrix mat, Vec3 phongCoeffs)
 	:Object(surfaceColor, transparency, objectType) {
 	this->transformMatrix = Matrix(mat);
+	this->inverseMatrix = (this->transformMatrix).inverse();
+	this->transposeMatrix = (this->inverseMatrix).transpose();
 	this->p1 = p1;
 	this->p2 = p2;
 	this->p3 = p3;
@@ -215,7 +252,14 @@ Triangle::Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 surfaceColor, double transpar
 
 
 // Source : http://www.lighthouse3d.com/tutorials/maths/ray-triangle-intersection/
-double Triangle::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) {
+double Triangle::intersectionPoints(const Vec3 &ro, const Vec3 &rd) {
+	Vec3 rayOrigin = ro;
+	Vec3 rayDirection = rd;
+	rayOrigin = inverseMatrix.transform(ro, 1);
+	rayDirection = inverseMatrix.transform(rd, 0);
+	double Ird = rayDirection.length();
+	rayDirection.normalize();
+
 	vector<double> points;
 	Vec3 e1,e2,h,s,q;
 	double a,f,u,v,t;
@@ -245,12 +289,12 @@ double Triangle::intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirect
 	t = f * e2.dot(q);
 
 	if (t > 0.00001) {
-		return(t);
+		return(t/Ird);
 	}
 	else
 		return (-1);
 }
 Vec3 Triangle::getNormal(const Vec3 point){
-	return (p2 -p1).cross(p3 - p1).normalize();
+	return transposeMatrix.transform((p2 -p1).cross(p3 - p1).normalize(), 0).normalize();
 }
 /*********************************************************************************************************************/

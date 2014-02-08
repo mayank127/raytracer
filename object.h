@@ -17,6 +17,8 @@ public:
 	Type objectType;
 	Vec3 phongCoeffs;
 	Matrix transformMatrix;
+	Matrix inverseMatrix;
+	Matrix transposeMatrix;
 
 	Object(Vec3 surfaceColor, double transparency, Type objectType, Vec3 phongCoeffs=Vec3(0.5,0.5,0.5));
 	virtual double intersectionPoints(const Vec3 &rayOrigin, const Vec3 &rayDirection) = 0;

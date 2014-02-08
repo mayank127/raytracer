@@ -18,6 +18,14 @@ Matrix::Matrix(Matrix& t) {
 			mat[i][j] = t.mat[i][j];
 	}
 }
+Matrix::Matrix(const Matrix& t) {
+	mat.assign(4,vector<double>(4,0));
+	for (int i=0;i<4;i++) mat[i][i] = 1;
+	for (int i=0;i<4;i++) {
+		for (int j=0;j<4;j++) 
+			mat[i][j] = t.mat[i][j];
+	}
+}
 
 Matrix::Matrix(Affine type, double angle) {
 	mat.assign(4,vector<double>(4,0));
