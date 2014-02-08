@@ -5,6 +5,7 @@
 #include "vec3.h"
 #include "object.h"
 #include "light.h"
+#include "matrix.h"
 #include <algorithm>
 #include <cstdlib>
 using namespace std;
@@ -13,8 +14,6 @@ using namespace std;
 #define WIDTH 640
 #define RECURSION_DEPTH 5
 #define TOTAL_SAMPLE 16
-
-
 
 Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objects, vector<Light> lights){
 	double intersectPoint = INFINITY;
@@ -147,6 +146,13 @@ void init(vector<Object*> objects, vector<Light> lights){
 int main(){
 	vector<Object*> objects;
 	vector<Light> lights;
+	Matrix m1(SCALE,Vec3(2,3,4));
+	Matrix m2(SHEAR,Vec3(2,3,6),Vec3(2,1,3));
+	m1 = m1 * m2;
+	m1.print();
+	m2 = m1.inverse();
+	m2.print();
+	(m1*m2).print();
 	Sphere sp1(Vec3(0,-10004,-20), 10000, Vec3(0.2,0.2,0.2), 0, DIFFUSED);
 	Sphere sp2(Vec3(0,0,-20), 4, Vec3(1,0.32,0.36), 0, SPECULAR);
 	Cylinder cy1(Vec3(0,-5,-30), Vec3(0,1,0), 2, 10, Vec3(1,0.32,0.36), 0, SPECULAR);
