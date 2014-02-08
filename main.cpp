@@ -125,6 +125,19 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 }
 
 void init(vector<Object*> objects, vector<Light> lights){
+	Vec3 n = (camera.pos - camera.lookAt).normalize();
+	Vec3 u = camera.up.cross(n).normalize();
+	Vec3 v = n.cross(u);
+
+	Vec3 e;
+	e.x = u.dot(camera.pos)*-1;
+	e.y = v.dot(camera.pos)*-1;
+	e.z = n.dot(camera.pos)*-1;
+
+
+	double V[16] = {u.x, u.y, u.z, e.x, v.x, v.y, v.z, e.y, n.x, n.y, n.z, e.z, 0, 0, 0, 1};
+	Matrix viewingTransform(V);
+
 	double aspectRatio = camera.width/(double) camera.height;
 	double angle = tan((M_PI/2)*camera.fov/180);
 
@@ -138,6 +151,7 @@ void init(vector<Object*> objects, vector<Light> lights){
 				double xx = (2 * ((ii + 0.5) / camera.width) - 1) * angle * aspectRatio;
 				double yy = (1 - 2 * ((jj + 0.5) / camera.height)) * angle;
 				Vec3 rayDirection(xx, yy, -1);
+				rayDirection = viewingTransform.transform(rayDirection, 0);
 				rayDirection.normalize();
 				image[i][j]+= sendRay(Vec3(0), rayDirection, 0, objects, lights);
 			}
@@ -171,7 +185,6 @@ int main(int argc, char** argv){
 
 	stack <Matrix> transform_stack;
 	Matrix current_transform;
-	Matrix camera_matrix;
 
 
 	vector<Object*> objects;
@@ -200,8 +213,6 @@ int main(int argc, char** argv){
 				ifs>>type;
 				if(type == "POS"){
 					ifs>>camera.pos.x>>camera.pos.y>>camera.pos.z;
-					Matrix temp(TRANSLATE, camera.pos * -1);
-					camera_matrix = camera_matrix * temp;
 				}
 				else if(type == "LOOKAT") {
 					ifs>>camera.lookAt.x>>camera.lookAt.y>>camera.lookAt.z;

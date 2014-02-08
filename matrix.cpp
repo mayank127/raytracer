@@ -105,6 +105,12 @@ Matrix Matrix::operator * (const Matrix& v) const {
 	}
 	return temp;
 }
+Matrix::Matrix(double V[16]){
+	mat.assign(4,vector<double>(4,0));
+	for(int i=0; i<16; i++){
+		mat[i/4][i%4] =  V[i];
+	}
+}
 
 Matrix Matrix::transpose() {
 	Matrix temp;

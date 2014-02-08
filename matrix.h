@@ -17,6 +17,8 @@ public:
 	Matrix(Affine type, Vec3 v, Vec3 extra);
 	Matrix(Affine type, double angle);
 	Matrix(Affine type, Vec3 v);
+	Matrix(double* V);
+
 	void swapRows(int i, int j);
 	void divideRow(int i, double temp);
 	int getRow(int i);
