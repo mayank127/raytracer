@@ -9,12 +9,23 @@
 #include <cstdlib>
 using namespace std;
 
-#define HEIGHT 480
-#define WIDTH 640
-#define RECURSION_DEPTH 5
-#define TOTAL_SAMPLE 16
+// #define HEIGHT 480
+// #define WIDTH 640
+// #define RECURSION_DEPTH 5
+// #define TOTAL_SAMPLE 16
 
+struct Camera {
+	Vec3 pos;
+	Vec3 lookAt;
+	Vec3 up;
+	double fov;
+	int width;
+	int height;
+	int total_samples;
+	int recursion_depth;
+};
 
+Camera camera;
 
 Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objects, vector<Light> lights){
 	double intersectPoint = INFINITY;
@@ -144,9 +155,66 @@ void init(vector<Object*> objects, vector<Light> lights){
 	}
 	ofs.close();
 }
-int main(){
+int main(int argc, char[] argv){
+	if(argc!=2){
+		cout<<"Usage: "<<argv[0]<<" scene_description_file"<<endl;
+		return -1;
+	}
+	ifstream ifs(agrv[1], ios::in);
+	if(!ifs.open()) {
+		cout<<"Error opening file"<<endl;
+		return -1;
+	}
+
+	stack <Matrix> transform_stack;
+	Matrix current_transform;
+
+	while(ifs.good()){
+		string type;
+		ifs>>type;
+		if(type=="CAMERA"){
+			while(ifs.good()){
+				ifs>>type;
+				if(type == "POS"){
+					ifs>>camera.pos.x>>camera.pos.y>>camera.pos.z;
+				}
+				else if(type == "LOOKAT") {
+					ifs>>camera.lookAt.x>>camera.lookAt.y>>camera.lookAt.z;
+				}
+				else if(type == "UP") {
+					ifs>>camera.up.x>>camera.up.y>>camera.up.z;
+				}
+				else if(type == "DIMENSION") {
+					ifs>>camera.width>>camera.height;
+				}
+				else if(type == "FOV") {
+					ifs>>camera.fov;
+				}
+				else if(type == "TOTAL_SAMPLES") {
+					ifs>>camera.total_samples;
+				}
+				else if(type == "RECURSION_DEPTH") {
+					ifs>>camera.recursion_depth;
+				}
+				else{
+					break;
+				}
+			}
+		}
+		if(type == "OBJECTS") {
+			while(ifs.good()){
+				ifs>>type;
+				if(type == "LOAD_IDENTITY"){
+
+				}
+
+			}
+		}
+	}
 	vector<Object*> objects;
 	vector<Light> lights;
+
+
 	Sphere sp1(Vec3(0,-10004,-20), 10000, Vec3(0.2,0.2,0.2), 0, DIFFUSED);
 	Sphere sp2(Vec3(0,0,-20), 4, Vec3(1,0.32,0.36), 0, SPECULAR);
 	Cylinder cy1(Vec3(0,-5,-30), Vec3(0,1,0), 2, 10, Vec3(1,0.32,0.36), 0, SPECULAR);
