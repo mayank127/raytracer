@@ -19,3 +19,6 @@ Sources for study material and references:
 
 For compiling run make
 To run specify a sample scene file and ./ray-tracer filename
+
+
+HTML Report URL - www.cse.iitb.ac.in/~manku/ray-tracer
