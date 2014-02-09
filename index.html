@@ -45,8 +45,71 @@
 <hr><p><strong>Code Description</strong></p>
 
 <ol>
-<li><strong>Main File</strong></li>
-</ol><p>... Alsacd</p>
+<li>
+<p><strong>Main File</strong></p>
+
+<ul>
+<li>It contains parser for input scene file.</li>
+<li>It first takes the light parameters and makes a list of light objeect with specified color.</li>
+<li>It then takes camera parameters and transform pixel points from image plane to view coordinate system then using postioon of eye, up vector and look at vector converts to World coordinate system.</li>
+<li>Now for each such point a ray is shot from camera to pixel and recursive ray tracing is done.</li>
+<li>For ray tracing we find out nearest intersection.</li>
+<li>Now if specular object then send refracted and reflected rays, and calculate color.</li>
+<li>If diffused object or recursion depth reached then check with shadow ray if light is visible to the point of intersection and calculate color according to phong model.</li>
+</ul>
+</li>
+<li>
+<p><strong>Objects</strong></p>
+
+<ul>
+<li>For each object we find out intersection with a ray from a given origin and direction.</li>
+<li>We also have a transformation matrix which is used to transform ray to object coordinate system and then use that to find out the intersection.</li>
+<li>We also have a function which returns normal of the object, which takes as input a point on surface and trasnforms it to object coordinate system and after finding normal at that point transform back to world coordinate space.</li>
+<li>Different objects made - 
+
+<ul>
+<li><strong>Sphere</strong></li>
+<li><strong>Cylinder</strong></li>
+<li><strong>Cone</strong></li>
+<li><strong>Triangle</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Lights</strong></p>
+
+<ul>
+<li>This contain only position and color of light used for phong model calculation.</li>
+</ul>
+</li>
+<li>
+<p><strong>Vec3</strong></p>
+
+<ul>
+<li>This contains function needed for a vector with 3 coordinates x,y,z.</li>
+<li>It contains functions like dot product, length, cross product, normalize, project, *,/,+,- etc.</li>
+</ul>
+</li>
+<li>
+<p><strong>Matrix</strong></p>
+
+<ul>
+<li>This contains 4x4 matrix used for transformation in 3-d Space.</li>
+<li>It has different constructors which can make rotation, scale, shear and translate matrices.</li>
+<li>Also it has usefull functions like inverse, transpose, multiply, transform etc.</li>
+</ul>
+</li>
+</ol><hr><p><strong>Sample Images</strong>
+<img src="www.cse.iitb.ac.in/%7Emanku/Images/ray-tracer/sample1.ppm" alt="Sample 1"></p>
+
+<p><img src="www.cse.iitb.ac.in/%7Emanku/Images/ray-tracer/sample2.ppm" alt="Sample 2"></p>
+
+<p><img src="www.cse.iitb.ac.in/%7Emanku/Images/ray-tracer/sample3.ppm" alt="Sample 3"></p>
+
+<p><img src="www.cse.iitb.ac.in/%7Emanku/Images/ray-tracer/sample4.ppm" alt="Sample 4"></p>
+
+<p><img src="www.cse.iitb.ac.in/%7Emanku/Images/ray-tracer/sample5.ppm" alt="Sample 5"></p>
 
 <hr><p><strong>Sources</strong></p>
 
