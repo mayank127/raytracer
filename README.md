@@ -57,15 +57,15 @@ To Run > ./ray-tracer scene-file
 ***
 
 **Sample Images**
-![Sample 1](http://www.cse.iitb.ac.in/~manku/Images/ray-tracer/sample1.jpg)
+![Sample 1](https://raw.githubusercontent.com/mayank127/raytracer/master/images/sample1.jpg)
 
-![Sample 2](http://www.cse.iitb.ac.in/~manku/Images/ray-tracer/sample2.jpg)
+![Sample 2](https://raw.githubusercontent.com/mayank127/raytracer/master/images/sample2.jpg)
 
-![Sample 3](http://www.cse.iitb.ac.in/~manku/Images/ray-tracer/sample3.jpg)
+![Sample 3](https://raw.githubusercontent.com/mayank127/raytracer/master/images/sample3.jpg)
 
-![Sample 4](http://www.cse.iitb.ac.in/~manku/Images/ray-tracer/sample4.jpg)
+![Sample 4](https://raw.githubusercontent.com/mayank127/raytracer/master/images/sample4.jpg)
 
-![Sample 5](http://www.cse.iitb.ac.in/~manku/Images/ray-tracer/sample5.jpg)
+![Sample 5](https://raw.githubusercontent.com/mayank127/raytracer/master/images/sample5.jpg)
 
 ***
 
